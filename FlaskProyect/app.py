@@ -1,5 +1,28 @@
-from flask import Flask
+from flask import Flask, jsonify
+from flask_mysqldb import MySQL
+import MySQLdb #Importación del MySQL
+
 app= Flask(__name__)
+
+#Definir las variables
+app.config['MYSQL_HOST']="localhost" #toma el 27001
+app.config['MYSQL_USER']="root" #Definir el usuario
+app.config['MYSQL_PASSWORD']="Cynthia13" #Definir la pw
+app.config['MYSQL_DB']="DBflask"
+#app.config['MYSQL_PORT']="3306" //usar solo en cambio de puerto
+
+#Declarar una variable de mysql pasando la estancia de MySQL de mi propia app
+mysql= MySQL(app)
+
+#ruta para probar la conexión a MySQL
+@app.route('/DBCheck')
+def DB_check():
+    try:
+        cursor= mysql.connection.cursor()
+        cursor.execute('Select 1')
+        return jsonify( {'status':'ok','message':'Conectado con exito'} ),200
+    except MySQLdb.MySQLError as e:
+        return jsonify( {'status':'error','message':str(e)} ),500
 
 #Ruta simple
 @app.route('/')
