@@ -32,6 +32,48 @@ def home():
     
     finally:
         cursor.close()
+        
+#Ruta para actualizar formulario
+@app.route('/formUpdate/<int:id>')
+def formUpdate(id):
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT * FROM BD_Albums WHERE id_Album = %s', (id,))
+        album = cursor.fetchone()
+        if album:
+            return render_template('formUpdate.html', album=album)
+        else:
+            flash('Álbum no encontrado')
+            return redirect(url_for('home'))
+    except Exception as e:
+        flash(f'Error: {e}')
+        return redirect(url_for('home'))
+    finally:
+        cursor.close()
+        
+#Ruta para procesar la actualización
+@app.route('/actualizarAlbum/<int:id>', methods=['POST'])
+def actualizarAlbum(id):
+    Vtitulo = request.form.get('txtTitulo', '').strip()
+    Vartista = request.form.get('txtArtista', '').strip()
+    Vanio = request.form.get('txtAnio', '').strip()
+
+    if not Vtitulo or not Vartista or not Vanio:
+        flash('Todos los campos son obligatorios')
+        return redirect(url_for('formUpdate', id=id))
+
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute('UPDATE BD_Albums SET album=%s, artista=%s, anio=%s WHERE id_Album=%s', (Vtitulo, Vartista, Vanio, id))
+        mysql.connection.commit()
+        flash('Album Actualizado en BD')
+        return redirect(url_for('home'))
+    except Exception as e:
+        mysql.connection.rollback()
+        flash('Error al actualizar: ' + str(e))
+        return redirect(url_for('formUpdate', id=id))
+    finally:
+        cursor.close()
 
 #Ruta de detalle
 @app.route('/detalle/<int:id>')
