@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Actualizar Álbum</title>
+</head>
+<body>
+    <h2>Actualiza Album</h2>
+
+    {% with mensajes = get_flashed_messages() %}
+            {% if mensajes%}
+                {% for msj in mensajes %}
+                    <h4 style="color: blue">{{ msj }}</h4>
+                {% endfor%}
+            {% endif%}
+        {% endwith%}
+
+    <form action="/actualizarAlbum/{{ album.0 }}" method="POST">
+        <input type="text" name="txtTitulo" value="{{ album.1 }}">
+        {% if errores and errores.txtTitulo %}
+            <p style="color: red;">{{errores.txtTitulo}}</p>
+        {% endif %}
+        <input type="text" name="txtArtista" value="{{ album.2 }}">
+        {% if errores and errores.txtArtista %}
+            <p style="color: red;">{{errores.txtArtista}}</p>
+        {% endif %}
+        <input type="text" name="txtAnio" value="{{ album.3 }}">
+        {% if errores and errores.txtAnio %}
+            <p style="color: red;">{{errores.txtAnio}}</p>
+        {% endif %}
+
+        <button type="submit"> Actualiza Álbum </button>
+    </form>
+
+    <br>
+    <a href="/">Regresar al formulario</a>
+</body>
+</html>
