@@ -22,7 +22,7 @@ mysql= MySQL(app)
 def home():
     try:
         cursor= mysql.connection.cursor()
-        cursor.execute('SELECT * FROM BD_Albums')
+        cursor.execute('SELECT * FROM BD_Albums WHERE State = 1')
         consultaTodo= cursor.fetchall()
         return render_template('formulario.html', errores={}, albums= consultaTodo)
     
@@ -80,7 +80,7 @@ def actualizarAlbum(id):
 def detalle(id):
     try:
         cursor= mysql.connection.cursor()
-        cursor.execute('SELECT * FROM BD_Albums WHERE id_Album=%s', (id,))
+        cursor.execute('SELECT * FROM BD_Albums WHERE id_Album=%s and State = 1', (id,))
         consultaId= cursor.fetchone()
         return render_template('consulta.html', album= consultaId)
     
@@ -90,6 +90,39 @@ def detalle(id):
     
     finally:
         cursor.close()
+        
+#Ruta para confirmar un delete
+@app.route('/confirmarEliminar/<int:id>')
+def confirmarEliminar(id):
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT * FROM BD_Albums WHERE id_Album = %s AND State = 1', (id,))
+        album = cursor.fetchone()
+        if album:
+            return render_template('confirmDel.html', album = album)
+        else:
+            flash('El album no se pudo encontrar o ya se eliminó, NIMODO')
+            return redirect(url_for('home'))
+    except Exception as e:
+        flash('Error: '+ str(e))
+        return redirect(url_for('home'))
+    finally:
+        cursor.close()
+        
+#Ruta para hacer el SOFT DELETE (cambiar state a 0)
+@app.route('/eliminarAlbum/<int:id>', methods=['POST'])
+def eliminarAlbum(id):
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute('UPDATE BD_Albums SET State = 0 WHERE id_Album = %s', (id,))
+        mysql.connection.commit()
+        flash('Album eliminado exitosamente :D')
+    except Exception as e:
+        mysql.connection.rollback()
+        flash('Error al eliminar: '+ str(e))
+    finally:
+        cursor.close()
+        return redirect(url_for('home'))
 
 #Ruta de consulta
 @app.route('/consulta')
