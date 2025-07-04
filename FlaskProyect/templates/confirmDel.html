@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmar Eliminación</title>
+</head>
+<body>
+    <h2 style="color:blueviolet;">¿Estás seguro de eliminar este álbum?</h2>
+
+    <form action="/eliminarAlbum/{{ album.0 }}" method="POST">
+        <input type="text" value="{{ album.1 }}" disabled>
+        <input type="text" value="{{ album.2 }}" disabled>
+        <input type="text" value="{{ album.3 }}" disabled>
+        <br><br>
+        <button type="submit">Confirmar Eliminación</button>
+    </form>
+    
+    <a href="/">Cancelar y regresar</a>
+</body>
+</html>
